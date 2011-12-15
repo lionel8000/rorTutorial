@@ -10,6 +10,8 @@
 #
 require 'digest'
 class User < ActiveRecord::Base
+        before_save :encrypt_password
+
 	attr_accessor :password
 	email_regex = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
 	attr_accessible :name,:email,:password,:password_confirmation
@@ -18,7 +20,7 @@ class User < ActiveRecord::Base
                   :uniqueness => {:case_sensitive => false}
 	validates :password,:confirmation =>true,
 		  :length => {:within=>6..40}
-  	before_save :encrypt_password
+  	
 
         def has_password?(submitted_password)
  		encrypted_password == encrypt(submitted_password)

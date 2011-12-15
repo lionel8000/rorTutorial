@@ -1,6 +1,7 @@
 class UsersController < ApplicationController
   before_filter :authenticate,:only=>[:index,:edit,:update]
   before_filter :correctuser,:only=>[:edit,:update]
+  before_filter :adminuser,:only=>[:destroy]
   
   def index
     @title = "All USERS"
@@ -16,6 +17,12 @@ class UsersController < ApplicationController
     @user = User.new
     @title = "Sign up"
   end
+
+  def destroy
+    User.find(params[:id]).destroy
+    flash[:success] = "delete the user!"
+    redirect_to users_path
+  end
   
   def create
     @user = User.new(params[:user])
@@ -28,6 +35,7 @@ class UsersController < ApplicationController
       render 'new'
     end
   end
+  
 
 
   def edit
@@ -48,6 +56,9 @@ class UsersController < ApplicationController
   end 
   
   private
+    def adminuser        
+        redirect_to root_path unless current_user.admin?
+    end
     def correctuser
        @user = User.find(params[:id])
        deny_access unless right_user? @user
